@@ -17,27 +17,27 @@ public class CookTask implements Callable<AssemblyLineStage> {
 
 	@Override
 	public AssemblyLineStage call() {
-		System.out.printf("Start cooking Task: %s, %s(%f, %d), %s, Oven size during cooking: %f\n",
+		Utils.log(String.format("Start cooking Task: %s, %s(%.0f, %d), %s, Oven size during cooking: %.0f",
 				Thread.currentThread().getName(), pio.getProduct().getProductName(), pio.getProduct().size(), pio.getProduct().cookTime().getSeconds(),
-				pio.getOven().getOvenName(), pio.getOven().size());
+				pio.getOven().getOvenName(), pio.getOven().size()));
 		long timeToCook = pio.getProduct().cookTime().getSeconds();
 		while (timeToCook > 0) {
 			try {
 				TimeUnit.SECONDS.sleep(1);
 			} catch (InterruptedException e) {
-				System.out.printf("%s timer interrupted!\n", pio.getOven().getOvenName());
+				Utils.log(String.format("%s timer interrupted!", pio.getOven().getOvenName()));
 			}
 			timeToCook--;
 		}
 		pio.getOven().take(pio.getProduct());
-		System.out.printf(
-				"Cooking task: %s, %s(%f, %d) taken from the oven after %d seconds. Current %s capacity is: %f\n",
+		Utils.log(String.format(
+				"Cooking task: %s, %s(%.0f, %d) taken from the oven after %d seconds. Current %s capacity is: %.0f",
 				Thread.currentThread().getName(), pio.getProduct().getProductName(), pio.getProduct().size(), pio.getProduct().cookTime().getSeconds(),
 				Duration.between(pio.getStartCooking(), LocalTime.now()).getSeconds(),
-				pio.getOven().getOvenName(), pio.getOven().size());
+				pio.getOven().getOvenName(), pio.getOven().size()));
 		assemblyLine.putAfter(pio.getProduct());
-		System.out.printf("End Cooking task: %s finished. Cooked %s returned to %s.\n",
-				Thread.currentThread().getName(), pio.getProduct().getProductName(), assemblyLine.getAssemblyLineName());
+		Utils.log(String.format("End Cooking task: %s finished. Cooked %s returned to %s.",
+				Thread.currentThread().getName(), pio.getProduct().getProductName(), assemblyLine.getAssemblyLineName()));
 		pio = null;
 		return assemblyLine;
 	}

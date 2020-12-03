@@ -46,18 +46,18 @@ public class OvenImpl implements Oven {
 
 	public void turnOn() {
 		turnedOn = -2;
-		System.out.printf("%s - turned on.\n", ovenName);
+		Utils.log(String.format("%s - turned on.", ovenName));
 	}
 
 	public void turnOn(Duration duration) {
 		turnedOn = duration.getSeconds();
-		System.out.printf("%s turned on for %d seconds.\n", ovenName, turnedOn);
+		Utils.log(String.format("%s turned on for %d seconds.", ovenName, turnedOn));
 		timer();
 	}
 
 	public void turnOff() {
 		turnedOn = -1;
-		System.out.printf("%s - turned off.\n", ovenName);
+		Utils.log(String.format("%s - turned off.", ovenName));
 	}
 
 	private void timer() {
@@ -67,7 +67,7 @@ public class OvenImpl implements Oven {
 				try {
 					TimeUnit.SECONDS.sleep(1);
 				} catch (InterruptedException e) {
-					System.out.printf("%s - timer interrupted!\n", ovenName);
+					Utils.log(String.format("%s - timer interrupted!", ovenName));
 				}
 				turnedOn--;
 			}
@@ -83,7 +83,7 @@ public class OvenImpl implements Oven {
 				try {
 					TimeUnit.SECONDS.sleep(1);
 				} catch (InterruptedException e) {
-					System.out.printf("%s - timer interrupted!\n", ovenName);
+					Utils.log(String.format("%s - timer interrupted!", ovenName));
 				}
 				timeToCook--;
 			}

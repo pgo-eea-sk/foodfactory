@@ -37,19 +37,19 @@ public class StoreTask implements Callable<AssemblyLineStage> {
 					p = pis.getProduct();
 				}
 			}
-			for (int i = 0; i < FoodFactory.ovens.size(); i++) {
+			for (int i = 0; i < FoodFactoryMain.ovens.size(); i++) {
 				try {
-					System.out.printf("%s(%f, %d) from store, %s, Oven size before: %f\n", p.getProductName(), p.size(),
-							p.cookTime().getSeconds(), FoodFactory.ovens.get(i).getOvenName(),
-							FoodFactory.ovens.get(i).size());
-					FoodFactory.ovens.get(i).put(p);
+					Utils.log(String.format("%s(%.0f, %d) from store, %s, Oven size before: %.0f", p.getProductName(), p.size(),
+							p.cookTime().getSeconds(), FoodFactoryMain.ovens.get(i).getOvenName(),
+							FoodFactoryMain.ovens.get(i).size()));
+					FoodFactoryMain.ovens.get(i).put(p);
 					pis.getStore().take(p);
 					pis = null;
-					productInOven.add(new ProductInOven(FoodFactory.ovens.get(i), p, LocalTime.now()));
+					productInOven.add(new ProductInOven(FoodFactoryMain.ovens.get(i), p, LocalTime.now()));
 					break;
 				} catch (CapacityExceededException e) {
-					System.out.println(e.getMessage());
-					if(i == FoodFactory.ovens.size() -1) {
+					Utils.log(e.getMessage());
+					if(i == FoodFactoryMain.ovens.size() -1) {
 						i = -1;
 					}
 					continue;
@@ -59,7 +59,7 @@ public class StoreTask implements Callable<AssemblyLineStage> {
 				continue;
 			}
 			try {
-				System.out.println("Spawning new CookTask from StoreTask!" + productInOven.peek().getProduct());
+				Utils.log(String.format("Spawning new CookTask from StoreTask!" + productInOven.peek().getProduct()));
 				futuresList.add(executor.submit(new CookTask(productInOven.take(), assemblyLine)));
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
@@ -81,7 +81,7 @@ public class StoreTask implements Callable<AssemblyLineStage> {
 				e.printStackTrace();
 			}
 		}
-		System.out.println("StoreTask executor shutdown!");
+		Utils.log(String.format("StoreTask executor shutdown!"));
 		executor.shutdown();
 		return assemblyLine;
 	}

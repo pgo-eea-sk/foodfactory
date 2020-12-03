@@ -7,14 +7,13 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 import java.util.Random;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-public class FoodFactory {
+public class FoodFactoryMain {
 
 	public static final String ASSEMBLY_LINE_NAME = "Assembly line ";
 	public static final String OVEN_NAME = "Oven ";
@@ -32,7 +31,7 @@ public class FoodFactory {
 
 		ExecutorService executor = Executors.newFixedThreadPool(linesCount);
 		for (int i = 0; i < linesCount; i++) {
-			System.out.println("Putting products to cook on assembly line: " + String.valueOf(i + 1));
+			Utils.log("Putting products to cook on assembly line: " + String.valueOf(i + 1));
 			futuresList.add(executor
 					.submit(new AssemblyLineTask(generateProductList(), ASSEMBLY_LINE_NAME + String.valueOf(i + 1))));
 		}
@@ -64,24 +63,24 @@ public class FoodFactory {
 //				e.printStackTrace();
 //			}
 //		}
-		System.out.println("FoodFactory executor shutdown!");
+		Utils.log("FoodFactory executor shutdown!");
 		executor.shutdown();
 	}
 
 	private static void readConfig() {
-		try (InputStream input = FoodFactory.class.getClassLoader().getResourceAsStream("config.properties")) {
+		try (InputStream input = FoodFactoryMain.class.getClassLoader().getResourceAsStream("config.properties")) {
 			Properties prop = new Properties();
 
 			if (input == null) {
-				System.out.println("Sorry, unable to find config.properties");
+				Utils.log("Sorry, unable to find config.properties");
 				return;
 			}
 
 			prop.load(input);
 			linesCount = Integer.valueOf(prop.getProperty("assemblyLines", "3"));
-			System.out.println("Configured lines count: " + linesCount);
+			Utils.log("Configured lines count: " + linesCount);
 			String propOvens = prop.getProperty("ovens");
-			System.out.println("Configured ovens sizes: " + propOvens);
+			Utils.log("Configured ovens sizes: " + propOvens);
 			List<Integer> ovensList = Arrays.asList(propOvens.split(",", -1)).stream().mapToInt(Integer::parseInt)
 					.boxed().collect(Collectors.toList());
 			ovens = new ArrayList<Oven>();
@@ -90,7 +89,7 @@ public class FoodFactory {
 			}
 
 			String propStores = prop.getProperty("stores");
-			System.out.println("Configured stores sizes: " + propStores);
+			Utils.log("Configured stores sizes: " + propStores);
 			List<Integer> storesList = Arrays.asList(propStores.split(",", -1)).stream().mapToInt(Integer::parseInt)
 					.boxed().collect(Collectors.toList());
 			stores = new ArrayList<Store>();
@@ -99,7 +98,7 @@ public class FoodFactory {
 			}
 
 		} catch (IOException ex) {
-			System.out.println("Error readin config.properties");
+			Utils.log("Error readin config.properties");
 			System.exit(0);
 		}
 	}
@@ -120,8 +119,7 @@ public class FoodFactory {
 		List<Product> generatedProductList = new ArrayList<Product>();
 		for (int i = 0; i < productListSize; i++) {
 			Product p = generateProduct();
-			System.out.printf("\tPlacing %s(%f, %d) on assembly line.\n", p.getProductName(), p.size(), p.cookTime().getSeconds(),
-					p.toString());
+			Utils.log(String.format("\tPlacing %s(%.0f, %d) on assembly line.", p.getProductName(), p.size(), p.cookTime().getSeconds()));
 			generatedProductList.add(p);
 		}
 		return generatedProductList;

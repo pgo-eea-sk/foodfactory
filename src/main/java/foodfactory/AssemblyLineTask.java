@@ -40,15 +40,15 @@ public class AssemblyLineTask implements Callable<AssemblyLineResults> {
 				if (p == null)
 					break;
 			}
-			for (Oven oven : FoodFactory.ovens) {
+			for (Oven oven : FoodFactoryMain.ovens) {
 				try {
-					System.out.printf("%s - %s(%f, %d), %s, Oven size before: %f\n", assemblyLineName, p.getProductName(), p.size(), p.cookTime().getSeconds(), oven.getOvenName(), oven.size());
+					Utils.log(String.format("%s - %s(%.0f, %d), %s, Oven size before: %.0f", assemblyLineName, p.getProductName(), p.size(), p.cookTime().getSeconds(), oven.getOvenName(), oven.size()));
 					oven.put(p);
 					productInOven.add(new ProductInOven(oven, p, LocalTime.now()));
 					p = null;
 					break;
 				} catch (CapacityExceededException e) {
-					System.out.println(e.getMessage());
+					Utils.log(e.getMessage());
 					continue;
 				}
 			}
@@ -61,16 +61,16 @@ public class AssemblyLineTask implements Callable<AssemblyLineResults> {
 						if (p == null)
 							break;
 					}
-					for (int i = 0; i < FoodFactory.stores.size(); i++) {
+					for (int i = 0; i < FoodFactoryMain.stores.size(); i++) {
 						try {
-							System.out.printf("%s - %s(%f, %d), Store: %s, Store size before: %f\n", assemblyLineName, p.getProductName(), p.size(), p.cookTime().getSeconds(), FoodFactory.stores.get(i).toString(), FoodFactory.stores.get(i).size());
-							FoodFactory.stores.get(i).put(p);
-							productInStore.add(new ProductInStore(FoodFactory.stores.get(i), p));
+							Utils.log(String.format("%s - %s(%.0f, %d), Store: %s, Store size before: %f", assemblyLineName, p.getProductName(), p.size(), p.cookTime().getSeconds(), FoodFactoryMain.stores.get(i).toString(), FoodFactoryMain.stores.get(i).size()));
+							FoodFactoryMain.stores.get(i).put(p);
+							productInStore.add(new ProductInStore(FoodFactoryMain.stores.get(i), p));
 							p = null;
 							break;
 
 						} catch (CapacityExceededException e) {
-							if (i == (FoodFactory.stores.size() - 1)) {
+							if (i == (FoodFactoryMain.stores.size() - 1)) {
 								i = 0;
 							}
 							continue;
@@ -85,13 +85,13 @@ public class AssemblyLineTask implements Callable<AssemblyLineResults> {
 					if (result != null && result.isDone()) {
 						break;
 					}
-					System.out.println(assemblyLineName + " - Spawning new StoreTask from AssemblyLineTask!" + productInStore.peek().getProduct().getProductName());
+					Utils.log(assemblyLineName + " - Spawning new StoreTask from AssemblyLineTask!" + productInStore.peek().getProduct().getProductName());
 					result = executor.submit(st);
 					futuresList.add(result);
 				}
 			}
 			try {
-				System.out.println(assemblyLineName + " - Spawning new CookTask from AssemblyLineTask! - " + productInOven.peek().getProduct().getProductName());
+				Utils.log(assemblyLineName + " - Spawning new CookTask from AssemblyLineTask! - " + productInOven.peek().getProduct().getProductName());
 				futuresList.add(executor.submit(new CookTask(productInOven.take(), assemblyLine)));
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
@@ -110,7 +110,7 @@ public class AssemblyLineTask implements Callable<AssemblyLineResults> {
 			try {
 				TimeUnit.SECONDS.sleep(1);
 			} catch (InterruptedException e) {
-				System.out.println("ERROR");
+				Utils.log("ERROR");
 				e.printStackTrace();
 			}
 		}
@@ -123,7 +123,7 @@ public class AssemblyLineTask implements Callable<AssemblyLineResults> {
 			}
 		}
 		executor.shutdown();
-		System.out.println(assemblyLineName + " - AssemblyLineTask executor shutdown executed!");
+		Utils.log(assemblyLineName + " - AssemblyLineTask executor shutdown executed!");
 		return assemblyLineResults;
 	}
 
