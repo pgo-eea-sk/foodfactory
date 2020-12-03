@@ -43,4 +43,6 @@ public interface Oven {
 	 * Turn off the Oven immediately, even if it was turned on with a duration which will be ignored.
 	 */
 	void turnOff();
+	
+	String getOvenName();
 }

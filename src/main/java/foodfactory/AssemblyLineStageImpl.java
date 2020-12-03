@@ -33,4 +33,8 @@ public class AssemblyLineStageImpl implements AssemblyLineStage {
 	public boolean isLineEmpty() {
 		return assemblyLine.isEmpty();
 	}
+	
+	public Product takeFinished() {
+		return cookedAssemblyLine.poll();
+	}
 }

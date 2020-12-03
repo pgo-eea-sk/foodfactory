@@ -11,7 +11,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.TimeUnit;
 
-public class StoreTask implements Callable<Integer> {
+public class StoreTask implements Callable<AssemblyLineStage> {
 
 	BlockingQueue<ProductInStore> pisq;
 	AssemblyLineStage assemblyLine;
@@ -22,10 +22,10 @@ public class StoreTask implements Callable<Integer> {
 	}
 
 	@Override
-	public Integer call() {
+	public AssemblyLineStage call() {
 		BlockingQueue<ProductInOven> productInOven = new LinkedBlockingDeque<ProductInOven>();
 		ExecutorService executor = Executors.newCachedThreadPool();
-		List<Future<Integer>> futuresList = new ArrayList<Future<Integer>>();
+		List<Future<AssemblyLineStage>> futuresList = new ArrayList<Future<AssemblyLineStage>>();
 		ProductInStore pis = null;
 		Product p = null;
 		while (true) {
@@ -38,11 +38,9 @@ public class StoreTask implements Callable<Integer> {
 				}
 			}
 			for (int i = 0; i < FoodFactory.ovens.size(); i++) {
-				System.out.printf("StoreThread: %s Product(%f, %d)[%s]\n", Thread.currentThread().getName(),
-						p.size(), p.cookTime().getSeconds(), p.toString());
 				try {
-					System.out.printf("Product(%f, %d)[%s] from store, Oven: %s, Oven size before: %f\n", p.size(),
-							p.cookTime().getSeconds(), p.toString(), FoodFactory.ovens.get(i).toString(),
+					System.out.printf("Product(%f, %d)[%s] from store, %s, Oven size before: %f\n", p.size(),
+							p.cookTime().getSeconds(), p.toString(), FoodFactory.ovens.get(i).getOvenName(),
 							FoodFactory.ovens.get(i).size());
 					FoodFactory.ovens.get(i).put(p);
 					pis.getStore().take(p);
@@ -52,7 +50,7 @@ public class StoreTask implements Callable<Integer> {
 				} catch (CapacityExceededException e) {
 					System.out.println(e.getMessage());
 					if(i == FoodFactory.ovens.size() -1) {
-						i = 0;
+						i = -1;
 					}
 					continue;
 				}
@@ -70,7 +68,7 @@ public class StoreTask implements Callable<Integer> {
 		}
 		Boolean allTasksFinished = true;
 		while (true) {
-			for (Future<Integer> future : futuresList) {
+			for (Future<AssemblyLineStage> future : futuresList) {
 				if (!future.isDone()) {
 					allTasksFinished = false;
 				}
@@ -85,7 +83,7 @@ public class StoreTask implements Callable<Integer> {
 		}
 		System.out.println("StoreTask executor shutdown!");
 		executor.shutdown();
-		return 0;
+		return assemblyLine;
 	}
 
 }

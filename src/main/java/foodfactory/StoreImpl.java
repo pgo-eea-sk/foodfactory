@@ -7,15 +7,17 @@ public class StoreImpl implements Store {
 	
 	BlockingQueue<Product> store;
 	double storeSize;
+	String storeName;
 	
-	StoreImpl(double initialSize) {
+	StoreImpl(double initialSize, String name) {
 		store = new LinkedBlockingQueue<Product>();
 		storeSize = initialSize;
+		storeName = name;
 	}
 
 	public void put(Product product) throws CapacityExceededException {
 		if (product.size() > storeSize) {
-			throw new CapacityExceededException("Store: " + this.toString() + " is full.");
+			throw new CapacityExceededException(storeName + " is full.");
 		} else {
 			try {
 				store.put(product);

@@ -26,5 +26,7 @@ public interface AssemblyLineStage {
 	 * Are there any uncooked products on the assembly line?
 	 * ​@return
 	 */ 
-	public boolean isLineEmpty();
+	boolean isLineEmpty();
+	
+	Product takeFinished();
 }

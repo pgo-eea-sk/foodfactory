@@ -10,9 +10,11 @@ public class OvenImpl implements Oven {
 	private double currentSize;
 	private long turnedOn = -1; // -1 turned off, positive value - turned for amount of seconds, -2 turned on
 								// until turn off
+	private String ovenName;
 
-	OvenImpl(double initialSize) {
+	OvenImpl(double initialSize, String name) {
 		currentSize = initialSize;
+		ovenName = name;
 	}
 
 	public double size() {
@@ -21,12 +23,11 @@ public class OvenImpl implements Oven {
 
 	public synchronized void put(Product product) throws CapacityExceededException {
 		if (product.size() > currentSize) {
-			throw new CapacityExceededException("Maximum oven capacity exceeded with Product[" + product.toString() + "]!");
+			throw new CapacityExceededException(ovenName + " - Maximum oven capacity exceeded with Product[" + product.toString() + "]!");
 		} else {
 			currentSize -= product.size();
 			if (product.cookTime().getSeconds() > turnedOn) {
 				turnedOn = product.cookTime().getSeconds();
-				System.out.printf("Oven (%s) turned on time extended to %d seconds.\n", this.toString(), turnedOn);
 			}
 		}
 		if (turnedOn == -2) {
@@ -45,18 +46,18 @@ public class OvenImpl implements Oven {
 
 	public void turnOn() {
 		turnedOn = -2;
-		System.out.printf("Oven (%s) turned on.\n", this.toString());
+		System.out.printf("%s - turned on.\n", ovenName);
 	}
 
 	public void turnOn(Duration duration) {
 		turnedOn = duration.getSeconds();
-		System.out.printf("Oven (%s) turned on for %d seconds.\n", this.toString(), turnedOn);
+		System.out.printf("%s turned on for %d seconds.\n", ovenName, turnedOn);
 		timer();
 	}
 
 	public void turnOff() {
 		turnedOn = -1;
-		System.out.printf("Oven (%s) turned off.\n", this.toString());
+		System.out.printf("%s - turned off.\n", ovenName);
 	}
 
 	private void timer() {
@@ -66,7 +67,7 @@ public class OvenImpl implements Oven {
 				try {
 					TimeUnit.SECONDS.sleep(1);
 				} catch (InterruptedException e) {
-					System.out.printf("Oven (%s) timer interrupted!\n", Thread.currentThread().getName());
+					System.out.printf("%s - timer interrupted!\n", ovenName);
 				}
 				turnedOn--;
 			}
@@ -82,12 +83,20 @@ public class OvenImpl implements Oven {
 				try {
 					TimeUnit.SECONDS.sleep(1);
 				} catch (InterruptedException e) {
-					System.out.printf("Oven (%s) timer interrupted!\n", Thread.currentThread().getName());
+					System.out.printf("%s - timer interrupted!\n", ovenName);
 				}
 				timeToCook--;
 			}
 
 		});
+	}
+
+	public String getOvenName() {
+		return ovenName;
+	}
+
+	public void setOvenName(String ovenName) {
+		this.ovenName = ovenName;
 	}
 
 }
