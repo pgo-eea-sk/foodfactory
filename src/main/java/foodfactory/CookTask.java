@@ -36,8 +36,8 @@ public class CookTask implements Callable<AssemblyLineStage> {
 				pio.getProduct().toString(), Duration.between(pio.getStartCooking(), LocalTime.now()).getSeconds(),
 				pio.getOven().getOvenName(), pio.getOven().size());
 		assemblyLine.putAfter(pio.getProduct());
-		System.out.printf("End Cooking task: %s finished. Cooked product returned to queue.\n",
-				Thread.currentThread().getName());
+		System.out.printf("End Cooking task: %s finished. Cooked Product[%s] returned to queue.\n",
+				Thread.currentThread().getName(), pio.getProduct().toString());
 		pio = null;
 		return assemblyLine;
 	}
