@@ -29,4 +29,6 @@ public interface AssemblyLineStage {
 	boolean isLineEmpty();
 	
 	Product takeFinished();
+	
+	String getAssemblyLineName();
 }

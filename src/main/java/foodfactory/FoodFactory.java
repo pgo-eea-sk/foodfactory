@@ -19,10 +19,12 @@ public class FoodFactory {
 	public static final String ASSEMBLY_LINE_NAME = "Assembly line ";
 	public static final String OVEN_NAME = "Oven ";
 	public static final String STORE_NAME = "Store ";
+	public static final String PRODUCT_NAME = "Product ";
 
 	public static List<Oven> ovens;
 	public static List<Store> stores;
 	private static int linesCount;
+	private static int productCounter = 1;
 
 	public static void main(String[] args) {
 		readConfig();
@@ -108,7 +110,7 @@ public class FoodFactory {
 	}
 
 	private static Product generateProduct() {
-		return new ProductImpl(generateNumber(), generateNumber());
+		return new ProductImpl(generateNumber(), generateNumber(), PRODUCT_NAME + String.valueOf(productCounter++));
 	}
 
 	private static List<Product> generateProductList() {
@@ -118,7 +120,7 @@ public class FoodFactory {
 		List<Product> generatedProductList = new ArrayList<Product>();
 		for (int i = 0; i < productListSize; i++) {
 			Product p = generateProduct();
-			System.out.printf("\tPlacing Product(%f, %d)[%s] on assembly line.\n", p.size(), p.cookTime().getSeconds(),
+			System.out.printf("\tPlacing %s(%f, %d) on assembly line.\n", p.getProductName(), p.size(), p.cookTime().getSeconds(),
 					p.toString());
 			generatedProductList.add(p);
 		}

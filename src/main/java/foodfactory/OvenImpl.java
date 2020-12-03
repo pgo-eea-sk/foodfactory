@@ -23,7 +23,7 @@ public class OvenImpl implements Oven {
 
 	public synchronized void put(Product product) throws CapacityExceededException {
 		if (product.size() > currentSize) {
-			throw new CapacityExceededException(ovenName + " - Maximum oven capacity exceeded with Product[" + product.toString() + "]!");
+			throw new CapacityExceededException(ovenName + " - Maximum oven capacity exceeded with " + product.getProductName() + "!");
 		} else {
 			currentSize -= product.size();
 			if (product.cookTime().getSeconds() > turnedOn) {

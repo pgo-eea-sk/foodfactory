@@ -6,10 +6,12 @@ public class ProductImpl implements Product {
 	
 	private final double productSize;
 	private final Duration cookTime;
+	private final String productName;
 
-	ProductImpl(double size, int cookTime) {
+	ProductImpl(double size, int cookTime, String name) {
 		productSize = size;
 		this.cookTime = Duration.ofSeconds(cookTime);
+		productName = name;
 	}
 	@Override
 	public double size() {
@@ -21,4 +23,8 @@ public class ProductImpl implements Product {
 		return cookTime;
 	}
 
+	@Override
+	public String getProductName() {
+		return productName;
+	}
 }

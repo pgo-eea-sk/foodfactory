@@ -17,9 +17,9 @@ public class CookTask implements Callable<AssemblyLineStage> {
 
 	@Override
 	public AssemblyLineStage call() {
-		System.out.printf("Start cooking Task: %s, Product(%f, %d)[%s], %s, Oven size during cooking: %f\n",
-				Thread.currentThread().getName(), pio.getProduct().size(), pio.getProduct().cookTime().getSeconds(),
-				pio.getProduct().toString(), pio.getOven().getOvenName(), pio.getOven().size());
+		System.out.printf("Start cooking Task: %s, %s(%f, %d), %s, Oven size during cooking: %f\n",
+				Thread.currentThread().getName(), pio.getProduct().getProductName(), pio.getProduct().size(), pio.getProduct().cookTime().getSeconds(),
+				pio.getOven().getOvenName(), pio.getOven().size());
 		long timeToCook = pio.getProduct().cookTime().getSeconds();
 		while (timeToCook > 0) {
 			try {
@@ -31,13 +31,13 @@ public class CookTask implements Callable<AssemblyLineStage> {
 		}
 		pio.getOven().take(pio.getProduct());
 		System.out.printf(
-				"Cooking task: %s, Product(%f, %d)[%s} taken from the oven after %d seconds. Current %s capacity is: %f\n",
-				Thread.currentThread().getName(), pio.getProduct().size(), pio.getProduct().cookTime().getSeconds(),
-				pio.getProduct().toString(), Duration.between(pio.getStartCooking(), LocalTime.now()).getSeconds(),
+				"Cooking task: %s, %s(%f, %d) taken from the oven after %d seconds. Current %s capacity is: %f\n",
+				Thread.currentThread().getName(), pio.getProduct().getProductName(), pio.getProduct().size(), pio.getProduct().cookTime().getSeconds(),
+				Duration.between(pio.getStartCooking(), LocalTime.now()).getSeconds(),
 				pio.getOven().getOvenName(), pio.getOven().size());
 		assemblyLine.putAfter(pio.getProduct());
-		System.out.printf("End Cooking task: %s finished. Cooked Product[%s] returned to queue.\n",
-				Thread.currentThread().getName(), pio.getProduct().toString());
+		System.out.printf("End Cooking task: %s finished. Cooked %s returned to %s.\n",
+				Thread.currentThread().getName(), pio.getProduct().getProductName(), assemblyLine.getAssemblyLineName());
 		pio = null;
 		return assemblyLine;
 	}

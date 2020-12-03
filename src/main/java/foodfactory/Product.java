@@ -19,4 +19,6 @@ public interface Product {
 	 * This is the duration that this product should be cooked for.
 	 */
 	Duration cookTime(); 
+	
+	String getProductName();
 }

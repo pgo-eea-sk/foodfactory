@@ -27,7 +27,7 @@ public class AssemblyLineTask implements Callable<AssemblyLineResults> {
 
 	@Override
 	public AssemblyLineResults call() {
-		AssemblyLineStage assemblyLine = new AssemblyLineStageImpl(productsOnLine);
+		AssemblyLineStage assemblyLine = new AssemblyLineStageImpl(productsOnLine, assemblyLineName);
 		ExecutorService executor = Executors.newFixedThreadPool(productsOnLine.size());
 //		ExecutorService executor = Executors.newCachedThreadPool();
 		Product p = null;
@@ -42,7 +42,7 @@ public class AssemblyLineTask implements Callable<AssemblyLineResults> {
 			}
 			for (Oven oven : FoodFactory.ovens) {
 				try {
-					System.out.printf("%s - Product(%f, %d)[%s], Oven: %s, Oven size before: %f\n", assemblyLineName, p.size(),	p.cookTime().getSeconds(), p.toString(), oven.toString(), oven.size());
+					System.out.printf("%s - %s(%f, %d), %s, Oven size before: %f\n", assemblyLineName, p.getProductName(), p.size(), p.cookTime().getSeconds(), oven.getOvenName(), oven.size());
 					oven.put(p);
 					productInOven.add(new ProductInOven(oven, p, LocalTime.now()));
 					p = null;
@@ -63,7 +63,7 @@ public class AssemblyLineTask implements Callable<AssemblyLineResults> {
 					}
 					for (int i = 0; i < FoodFactory.stores.size(); i++) {
 						try {
-							System.out.printf("%s - Product(%f, %d)[%s], Store: %s, Store size before: %f\n", assemblyLineName, p.size(), p.cookTime().getSeconds(), p.toString(), FoodFactory.stores.get(i).toString(), FoodFactory.stores.get(i).size());
+							System.out.printf("%s - %s(%f, %d), Store: %s, Store size before: %f\n", assemblyLineName, p.getProductName(), p.size(), p.cookTime().getSeconds(), FoodFactory.stores.get(i).toString(), FoodFactory.stores.get(i).size());
 							FoodFactory.stores.get(i).put(p);
 							productInStore.add(new ProductInStore(FoodFactory.stores.get(i), p));
 							p = null;
@@ -85,13 +85,13 @@ public class AssemblyLineTask implements Callable<AssemblyLineResults> {
 					if (result != null && result.isDone()) {
 						break;
 					}
-					System.out.println(assemblyLineName + " - Spawning new StoreTask from AssemblyLineTask!" + productInStore.peek().getProduct().toString());
+					System.out.println(assemblyLineName + " - Spawning new StoreTask from AssemblyLineTask!" + productInStore.peek().getProduct().getProductName());
 					result = executor.submit(st);
 					futuresList.add(result);
 				}
 			}
 			try {
-				System.out.println(assemblyLineName + " - Spawning new CookTask from AssemblyLineTask! - " + productInOven.peek().getProduct().toString());
+				System.out.println(assemblyLineName + " - Spawning new CookTask from AssemblyLineTask! - " + productInOven.peek().getProduct().getProductName());
 				futuresList.add(executor.submit(new CookTask(productInOven.take(), assemblyLine)));
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block

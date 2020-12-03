@@ -8,11 +8,13 @@ public class AssemblyLineStageImpl implements AssemblyLineStage {
 
 	private BlockingQueue<Product> assemblyLine;
 	private BlockingQueue<Product> cookedAssemblyLine;
+	private String assemblyLineName;
 	
-	public AssemblyLineStageImpl(List<Product> products) {
+	public AssemblyLineStageImpl(List<Product> products, String name) {
 		assemblyLine = new LinkedBlockingQueue<Product>();
 		cookedAssemblyLine = new LinkedBlockingQueue<Product>();
 		assemblyLine.addAll(products);
+		assemblyLineName = name;
 	}
 
 	@Override
@@ -36,5 +38,9 @@ public class AssemblyLineStageImpl implements AssemblyLineStage {
 	
 	public Product takeFinished() {
 		return cookedAssemblyLine.poll();
+	}
+	
+	public String getAssemblyLineName() {
+		return assemblyLineName;
 	}
 }

@@ -39,8 +39,8 @@ public class StoreTask implements Callable<AssemblyLineStage> {
 			}
 			for (int i = 0; i < FoodFactory.ovens.size(); i++) {
 				try {
-					System.out.printf("Product(%f, %d)[%s] from store, %s, Oven size before: %f\n", p.size(),
-							p.cookTime().getSeconds(), p.toString(), FoodFactory.ovens.get(i).getOvenName(),
+					System.out.printf("%s(%f, %d) from store, %s, Oven size before: %f\n", p.getProductName(), p.size(),
+							p.cookTime().getSeconds(), FoodFactory.ovens.get(i).getOvenName(),
 							FoodFactory.ovens.get(i).size());
 					FoodFactory.ovens.get(i).put(p);
 					pis.getStore().take(p);
