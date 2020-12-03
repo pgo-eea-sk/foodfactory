@@ -63,7 +63,7 @@ public class AssemblyLineTask implements Callable<AssemblyLineResults> {
 					}
 					for (int i = 0; i < FoodFactoryMain.stores.size(); i++) {
 						try {
-							Utils.log(String.format("%s - %s(%.0f, %d), Store: %s, Store size before: %f", assemblyLineName, p.getProductName(), p.size(), p.cookTime().getSeconds(), FoodFactoryMain.stores.get(i).toString(), FoodFactoryMain.stores.get(i).size()));
+							Utils.log(String.format("%s - %s(%.0f, %d), Store: %s, Store size before: %.0f", assemblyLineName, p.getProductName(), p.size(), p.cookTime().getSeconds(), FoodFactoryMain.stores.get(i).toString(), FoodFactoryMain.stores.get(i).size()));
 							FoodFactoryMain.stores.get(i).put(p);
 							productInStore.add(new ProductInStore(FoodFactoryMain.stores.get(i), p));
 							p = null;
@@ -85,7 +85,7 @@ public class AssemblyLineTask implements Callable<AssemblyLineResults> {
 					if (result != null && result.isDone()) {
 						break;
 					}
-					Utils.log(assemblyLineName + " - Spawning new StoreTask from AssemblyLineTask!" + productInStore.peek().getProduct().getProductName());
+					Utils.log(assemblyLineName + " - Spawning new StoreTask from AssemblyLineTask! " + productInStore.peek().getProduct().getProductName());
 					result = executor.submit(st);
 					futuresList.add(result);
 				}

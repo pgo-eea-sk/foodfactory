@@ -5,7 +5,7 @@ import java.util.Date;
 
 public class Utils {
 
-	private static final String TIME_FORMAT = "HH:mm:ss:S";
+	private static final String TIME_FORMAT = "HH:mm:ss:SSS";
 
 	public static void log(String message) {
 		SimpleDateFormat sdf = new SimpleDateFormat(TIME_FORMAT);

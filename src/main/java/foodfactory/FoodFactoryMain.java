@@ -47,7 +47,7 @@ public class FoodFactoryMain {
 			try {
 				TimeUnit.SECONDS.sleep(1);
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
+				Utils.log("FoodFactoryMain: InterruptedException");
 				e.printStackTrace();
 			}
 		}
@@ -115,7 +115,6 @@ public class FoodFactoryMain {
 	private static List<Product> generateProductList() {
 		// TODO
 		int productListSize = generateNumber();
-//		int productListSize = 3;
 		List<Product> generatedProductList = new ArrayList<Product>();
 		for (int i = 0; i < productListSize; i++) {
 			Product p = generateProduct();

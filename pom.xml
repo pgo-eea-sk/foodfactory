@@ -27,7 +27,7 @@
 					<archive>
 						<manifest>
 							<addClasspath>true</addClasspath>
-							<mainClass>foodfactory.FoodFactory</mainClass>
+							<mainClass>foodfactory.FoodFactoryMain</mainClass>
 						</manifest>
 					</archive>
 				</configuration>

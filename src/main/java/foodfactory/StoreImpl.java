@@ -45,4 +45,10 @@ public class StoreImpl implements Store {
 		return storeSize;
 	}
 
+	@Override
+	public String toString() {
+		return storeName;
+	}
+
+	
 }

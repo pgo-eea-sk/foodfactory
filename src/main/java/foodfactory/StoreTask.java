@@ -43,7 +43,7 @@ public class StoreTask implements Callable<AssemblyLineStage> {
 							p.cookTime().getSeconds(), FoodFactoryMain.ovens.get(i).getOvenName(),
 							FoodFactoryMain.ovens.get(i).size()));
 					FoodFactoryMain.ovens.get(i).put(p);
-//					pis.getStore().take(p);
+					pis.getStore().take(p);
 					pis = null;
 					productInOven.add(new ProductInOven(FoodFactoryMain.ovens.get(i), p, LocalTime.now()));
 					break;
@@ -59,10 +59,10 @@ public class StoreTask implements Callable<AssemblyLineStage> {
 				continue;
 			}
 			try {
-				Utils.log(String.format("Spawning new CookTask from StoreTask!" + productInOven.peek().getProduct()));
+				Utils.log(String.format("Spawning new CookTask from StoreTask! " + productInOven.peek().getProduct().getProductName()));
 				futuresList.add(executor.submit(new CookTask(productInOven.take(), assemblyLine)));
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
+				Utils.log("Store task: InterruptedException");
 				e.printStackTrace();
 			}
 		}
@@ -77,7 +77,7 @@ public class StoreTask implements Callable<AssemblyLineStage> {
 			try {
 				TimeUnit.SECONDS.sleep(1);
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
+				Utils.log("Store task: InterruptedException");
 				e.printStackTrace();
 			}
 		}

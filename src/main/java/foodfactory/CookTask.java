@@ -17,8 +17,8 @@ public class CookTask implements Callable<AssemblyLineStage> {
 
 	@Override
 	public AssemblyLineStage call() {
-		Utils.log(String.format("Start cooking Task: %s, %s(%.0f, %d), %s, Oven size during cooking: %.0f",
-				Thread.currentThread().getName(), pio.getProduct().getProductName(), pio.getProduct().size(), pio.getProduct().cookTime().getSeconds(),
+		Utils.log(String.format("Start cooking Task: %s(%.0f, %d), %s, Oven size during cooking: %.0f",
+				pio.getProduct().getProductName(), pio.getProduct().size(), pio.getProduct().cookTime().getSeconds(),
 				pio.getOven().getOvenName(), pio.getOven().size()));
 		long timeToCook = pio.getProduct().cookTime().getSeconds();
 		while (timeToCook > 0) {
@@ -31,13 +31,13 @@ public class CookTask implements Callable<AssemblyLineStage> {
 		}
 		pio.getOven().take(pio.getProduct());
 		Utils.log(String.format(
-				"Cooking task: %s, %s(%.0f, %d) taken from the oven after %d seconds. Current %s capacity is: %.0f",
-				Thread.currentThread().getName(), pio.getProduct().getProductName(), pio.getProduct().size(), pio.getProduct().cookTime().getSeconds(),
+				"Cooking task: %s(%.0f, %d) taken from the oven after %d seconds. Current %s capacity is: %.0f",
+				pio.getProduct().getProductName(), pio.getProduct().size(), pio.getProduct().cookTime().getSeconds(),
 				Duration.between(pio.getStartCooking(), LocalTime.now()).getSeconds(),
 				pio.getOven().getOvenName(), pio.getOven().size()));
 		assemblyLine.putAfter(pio.getProduct());
-		Utils.log(String.format("End Cooking task: %s finished. Cooked %s returned to %s.",
-				Thread.currentThread().getName(), pio.getProduct().getProductName(), assemblyLine.getAssemblyLineName()));
+		Utils.log(String.format("End Cooking task finished. Cooked %s returned to %s.",
+				pio.getProduct().getProductName(), assemblyLine.getAssemblyLineName()));
 		pio = null;
 		return assemblyLine;
 	}
