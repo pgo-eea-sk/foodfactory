@@ -9,6 +9,6 @@ public class Utils {
 
 	public static void log(String message) {
 		SimpleDateFormat sdf = new SimpleDateFormat(TIME_FORMAT);
-		System.out.println(sdf.format(new Date()) + " - " + message);
+		System.out.println(sdf.format(new Date()) + " - " + Thread.currentThread().getName() + " - " + message);
 	}
 }

@@ -43,7 +43,7 @@ public class StoreTask implements Callable<AssemblyLineStage> {
 							p.cookTime().getSeconds(), FoodFactoryMain.ovens.get(i).getOvenName(),
 							FoodFactoryMain.ovens.get(i).size()));
 					FoodFactoryMain.ovens.get(i).put(p);
-					pis.getStore().take(p);
+//					pis.getStore().take(p);
 					pis = null;
 					productInOven.add(new ProductInOven(FoodFactoryMain.ovens.get(i), p, LocalTime.now()));
 					break;
