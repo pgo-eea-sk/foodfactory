@@ -22,6 +22,6 @@ If there is no space in the ovens, assembly line is trying to find place in one 
 If no free space is found in the ovens, it sleeps for 0,5s and tries to find free space again. If free space is found in one of the ovens cooking task is spawned like from the assembly line.
 If there is no free space in the stores and in the ovens, assembly lines halt until some of the resources is free again.
 
-Product(2,1) in the printed output means product with size 2 with cooking time 1s.
-Oven(5) means Oven with size 5.
-Store(6) means Store with size 6.
+Product(2,1) in the printed output means product with size 2 with cooking time 1s.  
+Oven(5) means Oven with size 5.  
+Store(6) means Store with size 6.  
