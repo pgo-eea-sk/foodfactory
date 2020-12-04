@@ -1,6 +1,8 @@
 package foodfactory;
 
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -8,13 +10,17 @@ import java.util.concurrent.TimeUnit;
 public class OvenImpl implements Oven {
 
 	private double currentSize;
+	private double initialSize;
 	private long turnedOn = -1; // -1 turned off, positive value - turned for amount of seconds, -2 turned on
 								// until turn off
 	private String ovenName;
+	private List<Product> productsInOven;
 
 	OvenImpl(double initialSize, String name) {
 		currentSize = initialSize;
+		this.initialSize = initialSize;
 		ovenName = name;
+		productsInOven = new ArrayList<Product>();
 	}
 
 	public double size() {
@@ -23,21 +29,23 @@ public class OvenImpl implements Oven {
 
 	public synchronized void put(Product product) throws CapacityExceededException {
 		if (product.size() > currentSize) {
-			throw new CapacityExceededException(ovenName + " - Maximum oven capacity exceeded with " + product.getProductName() + "!");
+			throw new CapacityExceededException(
+					ovenName + " - Maximum oven capacity exceeded with " + product.toString() + "!");
 		} else {
+			productsInOven.add(product);
 			currentSize -= product.size();
 			if (product.cookTime().getSeconds() > turnedOn) {
 				turnedOn = product.cookTime().getSeconds();
 			}
 		}
 		if (turnedOn == -2) {
-//			turnOn(product.cookTime());
 			turnOn();
 		}
 
 	}
 
 	public synchronized void take(Product product) {
+		productsInOven.remove(product);
 		currentSize += product.size();
 		if (turnedOn == 0) {
 			turnOff();
@@ -75,28 +83,13 @@ public class OvenImpl implements Oven {
 		});
 	}
 
-	private void productTimer(Product p) {
-		ExecutorService executor = Executors.newSingleThreadExecutor();
-		executor.submit(() -> {
-			long timeToCook = p.cookTime().getSeconds();
-			while (timeToCook > 0) {
-				try {
-					TimeUnit.SECONDS.sleep(1);
-				} catch (InterruptedException e) {
-					Utils.log(String.format("%s - timer interrupted!", ovenName));
-				}
-				timeToCook--;
-			}
-
-		});
+	@Override
+	public String toString() {
+		return String.format("%s(%.0f)", ovenName, initialSize);
 	}
 
-	public String getOvenName() {
-		return ovenName;
+	@Override
+	public synchronized List<Product> getProductsInOven() {
+		return productsInOven;
 	}
-
-	public void setOvenName(String ovenName) {
-		this.ovenName = ovenName;
-	}
-
 }
