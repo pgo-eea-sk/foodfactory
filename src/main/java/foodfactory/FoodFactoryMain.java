@@ -101,8 +101,9 @@ public class FoodFactoryMain {
 				while (true) {
 					Utils.niceOutput(assemblyLines);
 					try {
-						TimeUnit.MILLISECONDS.sleep(100);
+						TimeUnit.MILLISECONDS.sleep(200);
 					} catch (InterruptedException ie) {
+						Thread.currentThread().interrupt();
 						break;
 					}
 				}
