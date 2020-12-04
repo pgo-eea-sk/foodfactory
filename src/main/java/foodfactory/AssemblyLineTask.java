@@ -11,11 +11,13 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * 
- * @author Peter Golian Task which implements assembly line. It tries to put
- *         product in the oven and if there is no free space in the ovens it
- *         tries tu put the product in the store, if there is no free store, it
- *         halts until some oven or store is free (it prevents situation, that
- *         some big product is waiting in store and line is halted for it)
+ * Task which implements assembly line. It tries to put product in the oven and
+ * if there is no free space in the ovens it tries tu put the product in the
+ * store, if there is no free store, it halts until some oven or store is free
+ * (it prevents situation, that some big product is waiting in store and line is
+ * halted for it)
+ * 
+ * @author Peter Golian
  */
 public class AssemblyLineTask implements Callable<String> {
 

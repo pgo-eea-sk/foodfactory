@@ -12,7 +12,7 @@ public class AssemblyLineStageImpl implements AssemblyLineStage {
 	private BlockingQueue<Product> cookedAssemblyLine;
 	private String assemblyLineName;
 	private int productCount;
-	
+
 	public AssemblyLineStageImpl(List<Product> products, String name) {
 		assemblyLine = new LinkedBlockingQueue<Product>();
 		assemblyLine.addAll(products);
@@ -31,7 +31,7 @@ public class AssemblyLineStageImpl implements AssemblyLineStage {
 	public Product take() {
 		return assemblyLine.poll();
 	}
-	
+
 	public double getHeadProductSize() {
 		return assemblyLine.peek().size();
 	}
@@ -39,12 +39,12 @@ public class AssemblyLineStageImpl implements AssemblyLineStage {
 	public boolean isLineEmpty() {
 		return assemblyLine.isEmpty();
 	}
-	
+
 	@Override
 	public String toString() {
 		return assemblyLineName;
 	}
-	
+
 	public int remainig() {
 		return assemblyLine.size();
 	}
@@ -52,14 +52,15 @@ public class AssemblyLineStageImpl implements AssemblyLineStage {
 	public int inputQueueSize() {
 		return productCount;
 	}
+
 	public int outputQueueSize() {
 		return cookedAssemblyLine.size();
 	}
-	
+
 	public synchronized List<Product> getInputLineProducts() {
 		Iterator<Product> i = assemblyLine.iterator();
 		List<Product> productsOnInput = new ArrayList<Product>();
-		while(i.hasNext()) {
+		while (i.hasNext()) {
 			productsOnInput.add(i.next());
 		}
 		return productsOnInput;
@@ -68,7 +69,7 @@ public class AssemblyLineStageImpl implements AssemblyLineStage {
 	public synchronized List<Product> getOutputLineProducts() {
 		Iterator<Product> i = cookedAssemblyLine.iterator();
 		List<Product> productsOnOutput = new ArrayList<Product>();
-		while(i.hasNext()) {
+		while (i.hasNext()) {
 			productsOnOutput.add(i.next());
 		}
 		return productsOnOutput;

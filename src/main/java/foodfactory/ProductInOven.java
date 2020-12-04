@@ -4,8 +4,11 @@ import java.time.LocalTime;
 
 /**
  * 
+ * 
+ * Helper class which stores information about which product is cooking in which
+ * oven
+ * 
  * @author Peter Golian
- * Helper class which stores information about which product is cooking in which oven
  *
  */
 public class ProductInOven {
@@ -44,4 +47,3 @@ public class ProductInOven {
 	}
 
 }
-

@@ -2,8 +2,10 @@ package foodfactory;
 
 /**
  * 
- * @author Peter Golian
+ * 
  * Helper class to store information which product originates from which line
+ * 
+ * @author Peter Golian
  *
  */
 public class ProductFromLine {
@@ -32,4 +34,3 @@ public class ProductFromLine {
 	}
 
 }
-

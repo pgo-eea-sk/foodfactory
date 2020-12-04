@@ -10,11 +10,13 @@ public class StoreImpl implements Store {
 
 	BlockingQueue<Product> store;
 	double storeSize;
+	double initialSize;
 	String storeName;
 
 	StoreImpl(double initialSize, String name) {
 		store = new LinkedBlockingQueue<Product>();
 		storeSize = initialSize;
+		this.initialSize = initialSize;
 		storeName = name;
 	}
 
@@ -50,7 +52,7 @@ public class StoreImpl implements Store {
 
 	@Override
 	public String toString() {
-		return storeName;
+		return String.format("%s(%.0f)", storeName, initialSize);
 	}
 
 	@Override

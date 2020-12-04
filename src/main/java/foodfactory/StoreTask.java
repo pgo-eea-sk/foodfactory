@@ -9,8 +9,11 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * 
+ * 
+ * Task which reads store queue tekes product from it and tries to put it in the
+ * first free oven.
+ * 
  * @author Peter Golian
- * Task which reads store queue tekes product from it and tries to put it in the first free oven 
  *
  */
 public class StoreTask implements Runnable {
@@ -42,17 +45,21 @@ public class StoreTask implements Runnable {
 				if (pfl != null && pfl.getAssemblyLine() == null && pfl.getProduct() == null) {
 					break;
 				}
-				store.take(pfl.getProduct());
+
 			}
-			// looping through ovens to find first free with enough free capacity to cook product
+			// looping through ovens to find first free with enough free capacity to cook
+			// product
 			for (int i = 0; i < FoodFactoryMain.ovens.size(); i++) {
 				try {
-					Utils.log(String.format("%s(%.0f, %d) from store, %s, Oven size before: %.0f", pfl.getProduct().toString(),
-							pfl.getProduct().size(), pfl.getProduct().cookTime().getSeconds(), FoodFactoryMain.ovens.get(i).toString(),
+					Utils.log(String.format("%s(%.0f, %d) from store, %s, Oven size before: %.0f",
+							pfl.getProduct().toString(), pfl.getProduct().size(),
+							pfl.getProduct().cookTime().getSeconds(), FoodFactoryMain.ovens.get(i).toString(),
 							FoodFactoryMain.ovens.get(i).size()));
 					FoodFactoryMain.ovens.get(i).put(pfl.getProduct());
-					productInOven.add(new ProductInOven(FoodFactoryMain.ovens.get(i), pfl.getProduct(), LocalTime.now()));
+					productInOven
+							.add(new ProductInOven(FoodFactoryMain.ovens.get(i), pfl.getProduct(), LocalTime.now()));
 					assemblyLine = pfl.getAssemblyLine();
+					store.take(pfl.getProduct());
 					pfl = null;
 					break;
 				} catch (CapacityExceededException e) {
@@ -72,16 +79,16 @@ public class StoreTask implements Runnable {
 //			if (pfl != null) {
 //				continue;
 //			}
-			
+
 			// Free oven found, spawning cooking task
-			Utils.log(String.format(
-					"Spawning new CookTask from StoreTask! " + productInOven.peek().getProduct().toString()));
+			Utils.log(String
+					.format("Spawning new CookTask from StoreTask! " + productInOven.peek().getProduct().toString()));
 			ProductInOven pio = productInOven.poll();
 			if (pio != null) {
 				ovenExecutor.submit(new CookTask(pio, assemblyLine));
 			}
 		}
-		
+
 		// shutdown executor after all products are cooked
 		ovenExecutor.shutdown();
 		Utils.log(String.format("%s - StoreTask executor shutdown!", store.toString()));

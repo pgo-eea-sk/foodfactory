@@ -3,7 +3,7 @@ package foodfactory;
 import java.time.Duration;
 
 public class ProductImpl implements Product {
-	
+
 	private final double productSize;
 	private final Duration cookTime;
 	private final String productName;
@@ -13,6 +13,7 @@ public class ProductImpl implements Product {
 		this.cookTime = Duration.ofSeconds(cookTime);
 		productName = name;
 	}
+
 	@Override
 	public double size() {
 		return productSize;
@@ -25,6 +26,6 @@ public class ProductImpl implements Product {
 
 	@Override
 	public String toString() {
-		return productName;
+		return String.format("%s(%.0f, %d)", productName, productSize, cookTime.getSeconds());
 	}
 }

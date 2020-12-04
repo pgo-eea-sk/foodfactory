@@ -10,6 +10,7 @@ import java.util.concurrent.TimeUnit;
 public class OvenImpl implements Oven {
 
 	private double currentSize;
+	private double initialSize;
 	private long turnedOn = -1; // -1 turned off, positive value - turned for amount of seconds, -2 turned on
 								// until turn off
 	private String ovenName;
@@ -17,6 +18,7 @@ public class OvenImpl implements Oven {
 
 	OvenImpl(double initialSize, String name) {
 		currentSize = initialSize;
+		this.initialSize = initialSize;
 		ovenName = name;
 		productsInOven = new ArrayList<Product>();
 	}
@@ -27,7 +29,8 @@ public class OvenImpl implements Oven {
 
 	public synchronized void put(Product product) throws CapacityExceededException {
 		if (product.size() > currentSize) {
-			throw new CapacityExceededException(ovenName + " - Maximum oven capacity exceeded with " + product.toString() + "!");
+			throw new CapacityExceededException(
+					ovenName + " - Maximum oven capacity exceeded with " + product.toString() + "!");
 		} else {
 			productsInOven.add(product);
 			currentSize -= product.size();
@@ -82,9 +85,9 @@ public class OvenImpl implements Oven {
 
 	@Override
 	public String toString() {
-		return ovenName;
+		return String.format("%s(%.0f)", ovenName, initialSize);
 	}
-	
+
 	@Override
 	public synchronized List<Product> getProductsInOven() {
 		return productsInOven;
