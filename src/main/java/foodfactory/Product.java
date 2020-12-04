@@ -20,5 +20,4 @@ public interface Product {
 	 */
 	Duration cookTime(); 
 	
-	String getProductName();
 }

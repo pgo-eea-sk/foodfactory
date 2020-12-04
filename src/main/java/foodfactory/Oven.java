@@ -44,5 +44,4 @@ public interface Oven {
 	 */
 	void turnOff();
 	
-	String getOvenName();
 }

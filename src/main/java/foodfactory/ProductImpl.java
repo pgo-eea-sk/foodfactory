@@ -24,7 +24,7 @@ public class ProductImpl implements Product {
 	}
 
 	@Override
-	public String getProductName() {
+	public String toString() {
 		return productName;
 	}
 }

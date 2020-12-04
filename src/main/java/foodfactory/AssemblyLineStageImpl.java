@@ -9,12 +9,14 @@ public class AssemblyLineStageImpl implements AssemblyLineStage {
 	private BlockingQueue<Product> assemblyLine;
 	private BlockingQueue<Product> cookedAssemblyLine;
 	private String assemblyLineName;
+	private int productCount;
 	
 	public AssemblyLineStageImpl(List<Product> products, String name) {
 		assemblyLine = new LinkedBlockingQueue<Product>();
 		cookedAssemblyLine = new LinkedBlockingQueue<Product>();
 		assemblyLine.addAll(products);
 		assemblyLineName = name;
+		productCount = products.size();
 	}
 
 	@Override
@@ -36,11 +38,19 @@ public class AssemblyLineStageImpl implements AssemblyLineStage {
 		return assemblyLine.isEmpty();
 	}
 	
-	public Product takeFinished() {
-		return cookedAssemblyLine.poll();
+	@Override
+	public String toString() {
+		return assemblyLineName;
 	}
 	
-	public String getAssemblyLineName() {
-		return assemblyLineName;
+	public int remainig() {
+		return assemblyLine.size();
+	}
+
+	public int inputQueueSize() {
+		return productCount;
+	}
+	public int outputQueueSize() {
+		return cookedAssemblyLine.size();
 	}
 }

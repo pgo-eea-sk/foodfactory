@@ -4,67 +4,84 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Random;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.stream.Collectors;
 
+/**
+ * 
+ * @author Peter Golian
+ * Main class, which spawns process for every assembly line and every store and fills assembly lines with test data.
+ * MAX_NUMBER_FROM_GENERATOR is maximum cout of products on one line, maximum size of the product and maximum cooking time in seconds.
+ * 
+ */
 public class FoodFactoryMain {
 
 	public static final String ASSEMBLY_LINE_NAME = "Assembly line ";
 	public static final String OVEN_NAME = "Oven ";
 	public static final String STORE_NAME = "Store ";
 	public static final String PRODUCT_NAME = "Product ";
+	private static final int MAX_NUMBER_FROM_GENERATOR = 5;
 
 	public static List<Oven> ovens;
 	public static List<Store> stores;
 	private static int linesCount;
-	private static int productCounter = 1;
+	public static int productCounter = 1;
 
 	public static void main(String[] args) {
+		//reads confog file
 		readConfig();
-		List<Future<AssemblyLineResults>> futuresList = new ArrayList<Future<AssemblyLineResults>>();
 
-		ExecutorService executor = Executors.newFixedThreadPool(linesCount);
+		ExecutorService alExecutor = Executors.newFixedThreadPool(linesCount);
+		ExecutorService storeExecutor = Executors.newFixedThreadPool(stores.size());
+		
+		//create queues for stores and spawn processes for them
+		Map<Store, BlockingQueue<ProductFromLine>> storeQueues = new HashMap<Store, BlockingQueue<ProductFromLine>>();
+		for (Store store : stores) {
+			BlockingQueue<ProductFromLine> storeQueue = new LinkedBlockingQueue<ProductFromLine>();
+			storeQueues.put(store, storeQueue);
+			storeExecutor.submit(new StoreTask(storeQueue, store));
+		}
+		List<Future<String>> finishedTasks = new ArrayList<Future<String>>();
+		// spawns processes for assembly lines
 		for (int i = 0; i < linesCount; i++) {
 			Utils.log("Putting products to cook on assembly line: " + String.valueOf(i + 1));
-			futuresList.add(executor
-					.submit(new AssemblyLineTask(generateProductList(), ASSEMBLY_LINE_NAME + String.valueOf(i + 1))));
+			finishedTasks.add(alExecutor.submit(new AssemblyLineTask(generateProductList(),
+					ASSEMBLY_LINE_NAME + String.valueOf(i + 1), storeQueues)));
 		}
-		while (true) {
-			Boolean allTasksFinished = true;
-			for (Future<AssemblyLineResults> future : futuresList) {
-				if (!future.isDone()) {
-					allTasksFinished = false;
-				}
-			}
-			if (allTasksFinished)
-				break;
+		
+		// test if all assembly lines were finished
+		for (Future<String> finishedTask : finishedTasks) {
 			try {
-				TimeUnit.SECONDS.sleep(1);
-			} catch (InterruptedException e) {
-				Utils.log("FoodFactoryMain: InterruptedException");
-				e.printStackTrace();
+				finishedTask.get();
+			} catch (InterruptedException | ExecutionException e) {
+				Utils.log("ERROR waiting until tasks end!");
 			}
 		}
-//		for (Future<AssemblyLineResults> future : futuresList) {
-//			AssemblyLineResults alr;
-//			try {
-//				alr = future.get();
-//				for (Product p : alr.getLineProducts()) {
-//					System.out.printf("%s - finished Product(%f, %d)[%s]\n", alr.getAssemblyLineName(), p.size(), p.cookTime(), p.toString());
-//				}
-//			} catch (InterruptedException | ExecutionException e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			}
-//		}
+
+		// turns off ovens
+		for(Oven oven : ovens) {
+			oven.turnOff();
+		}
+		alExecutor.shutdown();
+		
+		//sending signal to store queues, they can stop taking from queues and shutdown their executors
+		for(Map.Entry<Store, BlockingQueue<ProductFromLine>> storeQueue : storeQueues.entrySet()) {
+			storeQueue.getValue().add(new ProductFromLine(null, null));
+		}
+		
+		// shutdown store executors
+		storeExecutor.shutdown();
 		Utils.log("FoodFactory executor shutdown!");
-		executor.shutdown();
 	}
 
 	private static void readConfig() {
@@ -105,7 +122,7 @@ public class FoodFactoryMain {
 
 	private static int generateNumber() {
 		Random r = new Random();
-		return r.nextInt(2) + 1;
+		return r.nextInt(MAX_NUMBER_FROM_GENERATOR) + 1;
 	}
 
 	private static Product generateProduct() {
@@ -113,12 +130,12 @@ public class FoodFactoryMain {
 	}
 
 	private static List<Product> generateProductList() {
-		// TODO
 		int productListSize = generateNumber();
 		List<Product> generatedProductList = new ArrayList<Product>();
 		for (int i = 0; i < productListSize; i++) {
 			Product p = generateProduct();
-			Utils.log(String.format("\tPlacing %s(%.0f, %d) on assembly line.", p.getProductName(), p.size(), p.cookTime().getSeconds()));
+			Utils.log(String.format("\tPlacing %s(%.0f, %d) on assembly line.", p.toString(), p.size(),
+					p.cookTime().getSeconds()));
 			generatedProductList.add(p);
 		}
 		return generatedProductList;

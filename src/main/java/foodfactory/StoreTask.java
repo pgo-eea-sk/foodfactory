@@ -1,89 +1,90 @@
 package foodfactory;
 
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.TimeUnit;
 
-public class StoreTask implements Callable<AssemblyLineStage> {
+/**
+ * 
+ * @author Peter Golian
+ * Task which reads store queue tekes product from it and tries to put it in the first free oven 
+ *
+ */
+public class StoreTask implements Runnable {
 
-	BlockingQueue<ProductInStore> pisq;
-	AssemblyLineStage assemblyLine;
+	BlockingQueue<ProductFromLine> pflq;
+	Store store;
 
-	StoreTask(BlockingQueue<ProductInStore> productsInStore, AssemblyLineStage als) {
-		pisq = productsInStore;
-		assemblyLine = als;
+	StoreTask(BlockingQueue<ProductFromLine> productsFromLine, Store store) {
+		pflq = productsFromLine;
+		this.store = store;
 	}
 
 	@Override
-	public AssemblyLineStage call() {
+	public void run() {
+		Utils.log(String.format("StoreTask for %s started", store.toString()));
 		BlockingQueue<ProductInOven> productInOven = new LinkedBlockingDeque<ProductInOven>();
-		ExecutorService executor = Executors.newCachedThreadPool();
-		List<Future<AssemblyLineStage>> futuresList = new ArrayList<Future<AssemblyLineStage>>();
-		ProductInStore pis = null;
-		Product p = null;
+		ExecutorService ovenExecutor = Executors.newFixedThreadPool(FoodFactoryMain.productCounter);
+		ProductFromLine pfl = null;
+		AssemblyLineStage assemblyLine = null;
 		while (true) {
-			if (pis == null) {
-				pis = pisq.poll();
-				if (pis == null) {
-					break;
-				} else {
-					p = pis.getProduct();
+			if (pfl == null) {
+				try {
+					// taking products from store
+					pfl = pflq.take();
+				} catch (InterruptedException e) {
+					Utils.log(String.format("%s BlockingQueue take() interrupted!", store.toString()));
 				}
+				// test for signal to shutdown
+				if (pfl != null && pfl.getAssemblyLine() == null && pfl.getProduct() == null) {
+					break;
+				}
+				store.take(pfl.getProduct());
 			}
+			// looping through ovens to find first free with enough free capacity to cook product
 			for (int i = 0; i < FoodFactoryMain.ovens.size(); i++) {
 				try {
-					Utils.log(String.format("%s(%.0f, %d) from store, %s, Oven size before: %.0f", p.getProductName(), p.size(),
-							p.cookTime().getSeconds(), FoodFactoryMain.ovens.get(i).getOvenName(),
+					Utils.log(String.format("%s(%.0f, %d) from store, %s, Oven size before: %.0f", pfl.getProduct().toString(),
+							pfl.getProduct().size(), pfl.getProduct().cookTime().getSeconds(), FoodFactoryMain.ovens.get(i).toString(),
 							FoodFactoryMain.ovens.get(i).size()));
-					FoodFactoryMain.ovens.get(i).put(p);
-					pis.getStore().take(p);
-					pis = null;
-					productInOven.add(new ProductInOven(FoodFactoryMain.ovens.get(i), p, LocalTime.now()));
+					FoodFactoryMain.ovens.get(i).put(pfl.getProduct());
+					productInOven.add(new ProductInOven(FoodFactoryMain.ovens.get(i), pfl.getProduct(), LocalTime.now()));
+					assemblyLine = pfl.getAssemblyLine();
+					pfl = null;
 					break;
 				} catch (CapacityExceededException e) {
 					Utils.log(e.getMessage());
-					if(i == FoodFactoryMain.ovens.size() -1) {
+					if (i == FoodFactoryMain.ovens.size() - 1) {
 						i = -1;
 					}
+					try {
+						TimeUnit.MILLISECONDS.sleep(500);
+					} catch (InterruptedException ie) {
+						Utils.log(String.format("%s blocking task timer interrupted!", store.toString()));
+					}
+
 					continue;
 				}
 			}
-			if(pis != null) {
-				continue;
-			}
-			try {
-				Utils.log(String.format("Spawning new CookTask from StoreTask! " + productInOven.peek().getProduct().getProductName()));
-				futuresList.add(executor.submit(new CookTask(productInOven.take(), assemblyLine)));
-			} catch (InterruptedException e) {
-				Utils.log("Store task: InterruptedException");
-				e.printStackTrace();
-			}
-		}
-		Boolean allTasksFinished = true;
-		while (true) {
-			for (Future<AssemblyLineStage> future : futuresList) {
-				if (!future.isDone()) {
-					allTasksFinished = false;
-				}
-			}
-			if(allTasksFinished) break;
-			try {
-				TimeUnit.SECONDS.sleep(1);
-			} catch (InterruptedException e) {
-				Utils.log("Store task: InterruptedException");
-				e.printStackTrace();
+//			if (pfl != null) {
+//				continue;
+//			}
+			
+			// Free oven found, spawning cooking task
+			Utils.log(String.format(
+					"Spawning new CookTask from StoreTask! " + productInOven.peek().getProduct().toString()));
+			ProductInOven pio = productInOven.poll();
+			if (pio != null) {
+				ovenExecutor.submit(new CookTask(pio, assemblyLine));
 			}
 		}
-		Utils.log(String.format("StoreTask executor shutdown!"));
-		executor.shutdown();
-		return assemblyLine;
+		
+		// shutdown executor after all products are cooked
+		ovenExecutor.shutdown();
+		Utils.log(String.format("%s - StoreTask executor shutdown!", store.toString()));
 	}
 
 }

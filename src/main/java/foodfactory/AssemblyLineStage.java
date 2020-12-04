@@ -28,7 +28,8 @@ public interface AssemblyLineStage {
 	 */ 
 	boolean isLineEmpty();
 	
-	Product takeFinished();
+	int remainig();
+	int inputQueueSize();
+	int outputQueueSize();
 	
-	String getAssemblyLineName();
 }

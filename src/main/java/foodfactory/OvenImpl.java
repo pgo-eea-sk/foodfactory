@@ -23,7 +23,7 @@ public class OvenImpl implements Oven {
 
 	public synchronized void put(Product product) throws CapacityExceededException {
 		if (product.size() > currentSize) {
-			throw new CapacityExceededException(ovenName + " - Maximum oven capacity exceeded with " + product.getProductName() + "!");
+			throw new CapacityExceededException(ovenName + " - Maximum oven capacity exceeded with " + product.toString() + "!");
 		} else {
 			currentSize -= product.size();
 			if (product.cookTime().getSeconds() > turnedOn) {
@@ -31,7 +31,6 @@ public class OvenImpl implements Oven {
 			}
 		}
 		if (turnedOn == -2) {
-//			turnOn(product.cookTime());
 			turnOn();
 		}
 
@@ -75,28 +74,8 @@ public class OvenImpl implements Oven {
 		});
 	}
 
-	private void productTimer(Product p) {
-		ExecutorService executor = Executors.newSingleThreadExecutor();
-		executor.submit(() -> {
-			long timeToCook = p.cookTime().getSeconds();
-			while (timeToCook > 0) {
-				try {
-					TimeUnit.SECONDS.sleep(1);
-				} catch (InterruptedException e) {
-					Utils.log(String.format("%s - timer interrupted!", ovenName));
-				}
-				timeToCook--;
-			}
-
-		});
-	}
-
-	public String getOvenName() {
+	@Override
+	public String toString() {
 		return ovenName;
 	}
-
-	public void setOvenName(String ovenName) {
-		this.ovenName = ovenName;
-	}
-
 }
