@@ -1,5 +1,11 @@
 package foodfactory;
 
+/**
+ * 
+ * @author Peter Golian
+ * Helper class to store information which product originates from which line
+ *
+ */
 public class ProductFromLine {
 	private AssemblyLineStage assemblyLine;
 	private Product product;

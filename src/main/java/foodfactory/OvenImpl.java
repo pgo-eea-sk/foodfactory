@@ -1,6 +1,8 @@
 package foodfactory;
 
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -11,10 +13,12 @@ public class OvenImpl implements Oven {
 	private long turnedOn = -1; // -1 turned off, positive value - turned for amount of seconds, -2 turned on
 								// until turn off
 	private String ovenName;
+	private List<Product> productsInOven;
 
 	OvenImpl(double initialSize, String name) {
 		currentSize = initialSize;
 		ovenName = name;
+		productsInOven = new ArrayList<Product>();
 	}
 
 	public double size() {
@@ -25,6 +29,7 @@ public class OvenImpl implements Oven {
 		if (product.size() > currentSize) {
 			throw new CapacityExceededException(ovenName + " - Maximum oven capacity exceeded with " + product.toString() + "!");
 		} else {
+			productsInOven.add(product);
 			currentSize -= product.size();
 			if (product.cookTime().getSeconds() > turnedOn) {
 				turnedOn = product.cookTime().getSeconds();
@@ -37,6 +42,7 @@ public class OvenImpl implements Oven {
 	}
 
 	public synchronized void take(Product product) {
+		productsInOven.remove(product);
 		currentSize += product.size();
 		if (turnedOn == 0) {
 			turnOff();
@@ -77,5 +83,10 @@ public class OvenImpl implements Oven {
 	@Override
 	public String toString() {
 		return ovenName;
+	}
+	
+	@Override
+	public synchronized List<Product> getProductsInOven() {
+		return productsInOven;
 	}
 }

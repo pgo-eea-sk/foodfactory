@@ -1,5 +1,7 @@
 package foodfactory;
 
+import java.util.List;
+
 /** This represents an assembly line stage of the factory. Implementations of this class should be thread-safe
 */
 public interface AssemblyLineStage {
@@ -28,8 +30,30 @@ public interface AssemblyLineStage {
 	 */ 
 	boolean isLineEmpty();
 	
+	/**
+	 * ​@return remaining number of uncooked products on assembly line 
+	 */ 
 	int remainig();
+
+	/**
+	 * ​@return initial number of products on assembly line 
+	 */ 
 	int inputQueueSize();
+
+	/**
+	 * ​@return number of cooked products on assembly line 
+	 */ 
 	int outputQueueSize();
 	
+	/**
+	 * 
+	 * @return List of products in input queue
+	 */
+	List<Product> getInputLineProducts();
+
+	/**
+	 * 
+	 * @return List of products in output queue
+	 */
+	List<Product> getOutputLineProducts();
 }

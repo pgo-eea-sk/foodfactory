@@ -1,5 +1,7 @@
 package foodfactory;
 
+import java.util.List;
+
 /**
 * The store where to put the products if the oven is not available. This class is thread safe.
 */
@@ -30,5 +32,12 @@ public interface Store {
 	 * exception is thrown if adding a product.
 	 * ​@return
 	 */ 
-	public double size();
+	double size();
+	
+	/**
+	 * 
+	 * @return List of products in store queue
+	 */
+	List<Product> getStoreProducts();
+
 }

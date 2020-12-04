@@ -1,5 +1,7 @@
 package foodfactory;
 
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -13,8 +15,8 @@ public class AssemblyLineStageImpl implements AssemblyLineStage {
 	
 	public AssemblyLineStageImpl(List<Product> products, String name) {
 		assemblyLine = new LinkedBlockingQueue<Product>();
-		cookedAssemblyLine = new LinkedBlockingQueue<Product>();
 		assemblyLine.addAll(products);
+		cookedAssemblyLine = new LinkedBlockingQueue<Product>();
 		assemblyLineName = name;
 		productCount = products.size();
 	}
@@ -52,5 +54,23 @@ public class AssemblyLineStageImpl implements AssemblyLineStage {
 	}
 	public int outputQueueSize() {
 		return cookedAssemblyLine.size();
+	}
+	
+	public synchronized List<Product> getInputLineProducts() {
+		Iterator<Product> i = assemblyLine.iterator();
+		List<Product> productsOnInput = new ArrayList<Product>();
+		while(i.hasNext()) {
+			productsOnInput.add(i.next());
+		}
+		return productsOnInput;
+	}
+
+	public synchronized List<Product> getOutputLineProducts() {
+		Iterator<Product> i = cookedAssemblyLine.iterator();
+		List<Product> productsOnOutput = new ArrayList<Product>();
+		while(i.hasNext()) {
+			productsOnOutput.add(i.next());
+		}
+		return productsOnOutput;
 	}
 }

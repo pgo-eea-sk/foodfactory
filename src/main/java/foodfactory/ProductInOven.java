@@ -2,6 +2,12 @@ package foodfactory;
 
 import java.time.LocalTime;
 
+/**
+ * 
+ * @author Peter Golian
+ * Helper class which stores information about which product is cooking in which oven
+ *
+ */
 public class ProductInOven {
 	private Oven oven;
 	private Product product;

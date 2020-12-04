@@ -1,6 +1,7 @@
 package foodfactory;
 
 import java.time.Duration;
+import java.util.List;
 
 /**
 * This interface represents the Oven that cooks the products in the different assembly lines
@@ -43,5 +44,10 @@ public interface Oven {
 	 * Turn off the Oven immediately, even if it was turned on with a duration which will be ignored.
 	 */
 	void turnOff();
-	
+
+	/**
+	 * 
+	 * @return List of products currently in Oven
+	 */
+	List<Product> getProductsInOven();
 }

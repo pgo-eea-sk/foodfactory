@@ -15,6 +15,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -30,16 +31,41 @@ public class FoodFactoryMain {
 	public static final String OVEN_NAME = "Oven ";
 	public static final String STORE_NAME = "Store ";
 	public static final String PRODUCT_NAME = "Product ";
-	private static final int MAX_NUMBER_FROM_GENERATOR = 5;
+	private static final int MAX_NUMBER_FROM_GENERATOR = 10;
 
 	public static List<Oven> ovens;
 	public static List<Store> stores;
-	private static int linesCount;
 	public static int productCounter = 1;
+	public static boolean loggingEnabled = false;
+	private static int linesCount;
 
 	public static void main(String[] args) {
+		if(args.length == 1 && args[0].equals("-log")) {
+			loggingEnabled = true;
+		}
 		//reads confog file
 		readConfig();
+		
+		boolean okFlag = false;
+		for(Oven oven : ovens) {
+			if (MAX_NUMBER_FROM_GENERATOR <= oven.size()) {
+				okFlag = true;
+			}
+		}
+		if(!okFlag) {
+			Utils.specialLog(String.format("Maximum product size is set to %d. System will probably generate bigger products than is the biggest oven size! Please add bigger oven to config file! Shutting down!", MAX_NUMBER_FROM_GENERATOR));
+			System.exit(0);
+		}
+		okFlag = false;
+		for(Store store : stores) {
+			if (MAX_NUMBER_FROM_GENERATOR <= store.size()) {
+				okFlag = true;
+			}
+		}
+		if(!okFlag) {
+			Utils.specialLog(String.format("Maximum product size is set to %d. System will probably generate bigger products than is the biggest store size! Please add bigger store to config file! Shutting down!", MAX_NUMBER_FROM_GENERATOR));
+			System.exit(0);
+		}
 
 		ExecutorService alExecutor = Executors.newFixedThreadPool(linesCount);
 		ExecutorService storeExecutor = Executors.newFixedThreadPool(stores.size());
@@ -53,12 +79,23 @@ public class FoodFactoryMain {
 		}
 		List<Future<String>> finishedTasks = new ArrayList<Future<String>>();
 		// spawns processes for assembly lines
+		List<AssemblyLineStage> assemblyLines = new ArrayList<AssemblyLineStage>();
 		for (int i = 0; i < linesCount; i++) {
 			Utils.log("Putting products to cook on assembly line: " + String.valueOf(i + 1));
-			finishedTasks.add(alExecutor.submit(new AssemblyLineTask(generateProductList(),
-					ASSEMBLY_LINE_NAME + String.valueOf(i + 1), storeQueues)));
+			AssemblyLineStage als = new AssemblyLineStageImpl(generateProductList(), ASSEMBLY_LINE_NAME + String.valueOf(i + 1));
+			assemblyLines.add(als);
+			finishedTasks.add(alExecutor.submit(new AssemblyLineTask(als, storeQueues)));
 		}
-		
+		ExecutorService outputExecutor= null;;
+		if(!loggingEnabled) {
+			outputExecutor = Executors.newSingleThreadExecutor();
+			outputExecutor.submit(() -> {
+				while(true)	{
+					Utils.niceOutput(assemblyLines);
+					TimeUnit.MILLISECONDS.sleep(500);
+				}
+			});
+		}
 		// test if all assembly lines were finished
 		for (Future<String> finishedTask : finishedTasks) {
 			try {
@@ -71,6 +108,9 @@ public class FoodFactoryMain {
 		// turns off ovens
 		for(Oven oven : ovens) {
 			oven.turnOff();
+		}
+		if(!loggingEnabled) {
+			outputExecutor.shutdownNow();
 		}
 		alExecutor.shutdown();
 		
@@ -98,7 +138,7 @@ public class FoodFactoryMain {
 			Utils.log("Configured lines count: " + linesCount);
 			String propOvens = prop.getProperty("ovens");
 			Utils.log("Configured ovens sizes: " + propOvens);
-			List<Integer> ovensList = Arrays.asList(propOvens.split(",", -1)).stream().mapToInt(Integer::parseInt)
+			List<Integer> ovensList = Arrays.asList(propOvens.split(",", -1)).stream().mapToInt(i -> {String s= i.trim(); return Integer.valueOf(s);})
 					.boxed().collect(Collectors.toList());
 			ovens = new ArrayList<Oven>();
 			for (int i = 0; i < ovensList.size(); i++) {
@@ -107,7 +147,7 @@ public class FoodFactoryMain {
 
 			String propStores = prop.getProperty("stores");
 			Utils.log("Configured stores sizes: " + propStores);
-			List<Integer> storesList = Arrays.asList(propStores.split(",", -1)).stream().mapToInt(Integer::parseInt)
+			List<Integer> storesList = Arrays.asList(propStores.split(",", -1)).stream().mapToInt(i -> {String s= i.trim(); return Integer.valueOf(s);})
 					.boxed().collect(Collectors.toList());
 			stores = new ArrayList<Store>();
 			for (int i = 0; i < storesList.size(); i++) {
