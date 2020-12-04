@@ -24,9 +24,8 @@ public class CookTask implements Runnable {
 
 	@Override
 	public void run() {
-		Utils.log(String.format("Start cooking Task: %s(%.0f, %d), %s, Oven size during cooking: %.0f",
-				pio.getProduct().toString(), pio.getProduct().size(), pio.getProduct().cookTime().getSeconds(),
-				pio.getOven().toString(), pio.getOven().size()));
+		Utils.log(String.format("Start cooking Task: %s, %s, Oven size during cooking: %.0f",
+				pio.getProduct().toString(), pio.getOven().toString(), pio.getOven().size()));
 		long timeToCook = pio.getProduct().cookTime().getSeconds();
 		while (timeToCook > 0) {
 			try {
@@ -37,11 +36,9 @@ public class CookTask implements Runnable {
 			timeToCook--;
 		}
 		pio.getOven().take(pio.getProduct());
-		Utils.log(String.format(
-				"Cooking task: %s(%.0f, %d) taken from the oven after %d seconds. Current %s capacity is: %.0f",
-				pio.getProduct().toString(), pio.getProduct().size(), pio.getProduct().cookTime().getSeconds(),
-				Duration.between(pio.getStartCooking(), LocalTime.now()).getSeconds(), pio.getOven().toString(),
-				pio.getOven().size()));
+		Utils.log(String.format("Cooking task: %s taken from the oven after %d seconds. Current %s capacity is: %.0f",
+				pio.getProduct().toString(), Duration.between(pio.getStartCooking(), LocalTime.now()).getSeconds(),
+				pio.getOven().toString(), pio.getOven().size()));
 		assemblyLine.putAfter(pio.getProduct());
 		Utils.log(String.format("Finished cooking task. Cooked %s returned to %s.", pio.getProduct().toString(),
 				assemblyLine.toString()));

@@ -51,10 +51,8 @@ public class StoreTask implements Runnable {
 			// product
 			for (int i = 0; i < FoodFactoryMain.ovens.size(); i++) {
 				try {
-					Utils.log(String.format("%s(%.0f, %d) from store, %s, Oven size before: %.0f",
-							pfl.getProduct().toString(), pfl.getProduct().size(),
-							pfl.getProduct().cookTime().getSeconds(), FoodFactoryMain.ovens.get(i).toString(),
-							FoodFactoryMain.ovens.get(i).size()));
+					Utils.log(String.format("%s from store, %s, Oven size before: %.0f", pfl.getProduct().toString(),
+							FoodFactoryMain.ovens.get(i).toString(), FoodFactoryMain.ovens.get(i).size()));
 					FoodFactoryMain.ovens.get(i).put(pfl.getProduct());
 					productInOven
 							.add(new ProductInOven(FoodFactoryMain.ovens.get(i), pfl.getProduct(), LocalTime.now()));

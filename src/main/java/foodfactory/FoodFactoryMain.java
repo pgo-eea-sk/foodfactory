@@ -191,7 +191,7 @@ public class FoodFactoryMain {
 		List<Product> generatedProductList = new ArrayList<Product>();
 		for (int i = 0; i < productListSize; i++) {
 			Product p = generateProduct();
-			Utils.log(String.format("\tPlacing %s(%.0f, %d) on assembly line.", p.toString(), p.size(),
+			Utils.log(String.format("\tPlacing %s on assembly line.", p.toString(), p.size(),
 					p.cookTime().getSeconds()));
 			generatedProductList.add(p);
 		}

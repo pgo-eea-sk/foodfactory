@@ -48,9 +48,9 @@ public class AssemblyLineTask implements Callable<String> {
 			// searching for free oven
 			for (Oven oven : FoodFactoryMain.ovens) {
 				try {
-					Utils.log(String.format("%s - %s(%.0f, %d), %s, Oven size before: %.0f, Remainig products %d",
-							assemblyLine.toString(), p.toString(), p.size(), p.cookTime().getSeconds(), oven.toString(),
-							oven.size(), assemblyLine.remainig()));
+					Utils.log(String.format("%s - %s, %s, Oven size before: %.0f, Remainig products %d",
+							assemblyLine.toString(), p.toString(), oven.toString(), oven.size(),
+							assemblyLine.remainig()));
 					oven.put(p);
 					assemblyLine.take();
 					productInOven.add(new ProductInOven(oven, p, LocalTime.now()));
@@ -67,9 +67,9 @@ public class AssemblyLineTask implements Callable<String> {
 				while (true) {
 					for (Map.Entry<Store, BlockingQueue<ProductFromLine>> storeQueue : storeQueues.entrySet()) {
 						try {
-							Utils.log(String.format("%s - %s(%.0f, %d), Store: %s, Store size before: %.0f",
-									assemblyLine.toString(), p.toString(), p.size(), p.cookTime().getSeconds(),
-									storeQueue.getKey().toString(), storeQueue.getKey().size()));
+							Utils.log(String.format("%s - %s, Store: %s, Store size before: %.0f",
+									assemblyLine.toString(), p.toString(), storeQueue.getKey().toString(),
+									storeQueue.getKey().size()));
 							storeQueue.getKey().put(p);
 							storeQueue.getValue().add(new ProductFromLine(assemblyLine, p));
 							assemblyLine.take();
