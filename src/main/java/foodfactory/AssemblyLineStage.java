@@ -10,37 +10,37 @@ public interface AssemblyLineStage {
 
 	/**
 	 * Put the specified product to the assembly line to continue in the next stage.
-	 * ​@param ​product
+	 * @param ​product
 	 */
 	void putAfter(Product product);
 
 	/**
-	 * Takes the next product available from the assembly line. ​@return
+	 * @return Takes the next product available from the assembly line.
 	 */
 	Product take();
 
 	/**
-	 * Returns the size of next product available from the assembly line. ​@return
+	 * @return product available from the assembly line.
 	 */
-	double getHeadProductSize();
-
+	 Product getHeadProduct();
+	 
 	/**
-	 * Are there any uncooked products on the assembly line? ​@return
+	 * @return Are there any uncooked products on the assembly line?
 	 */
 	boolean isLineEmpty();
 
 	/**
-	 * ​@return remaining number of uncooked products on assembly line
+	 * @return remaining number of uncooked products on assembly line
 	 */
 	int remainig();
 
 	/**
-	 * ​@return initial number of products on assembly line
+	 * @return initial number of products on assembly line
 	 */
 	int inputQueueSize();
 
 	/**
-	 * ​@return number of cooked products on assembly line
+	 * @return number of cooked products on assembly line
 	 */
 	int outputQueueSize();
 

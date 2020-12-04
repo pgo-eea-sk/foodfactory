@@ -32,8 +32,8 @@ public class AssemblyLineStageImpl implements AssemblyLineStage {
 		return assemblyLine.poll();
 	}
 
-	public double getHeadProductSize() {
-		return assemblyLine.peek().size();
+	public Product getHeadProduct() {
+		return assemblyLine.peek();
 	}
 
 	public boolean isLineEmpty() {

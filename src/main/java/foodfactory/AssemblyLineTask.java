@@ -37,7 +37,7 @@ public class AssemblyLineTask implements Callable<String> {
 		while (true) {
 			if (p == null) {
 				// taking product from assembly line
-				p = assemblyLine.take();
+				p = assemblyLine.getHeadProduct();
 				if (p == null) {
 					break;
 				}
@@ -52,6 +52,7 @@ public class AssemblyLineTask implements Callable<String> {
 							assemblyLine.toString(), p.toString(), p.size(), p.cookTime().getSeconds(), oven.toString(),
 							oven.size(), assemblyLine.remainig()));
 					oven.put(p);
+					assemblyLine.take();
 					productInOven.add(new ProductInOven(oven, p, LocalTime.now()));
 					p = null;
 					break;
@@ -71,6 +72,7 @@ public class AssemblyLineTask implements Callable<String> {
 									storeQueue.getKey().toString(), storeQueue.getKey().size()));
 							storeQueue.getKey().put(p);
 							storeQueue.getValue().add(new ProductFromLine(assemblyLine, p));
+							assemblyLine.take();
 							p = null;
 							break;
 
