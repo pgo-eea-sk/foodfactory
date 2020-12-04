@@ -11,8 +11,8 @@ Java 1.8, Maven 3.3.9
 mvn clean install
 
 ## Program running
-java -jar target/foodfactory-0.0.1-SNAPSHOT.jar
-you can run it also with -log switch to show more extensive logging
+java -jar target/foodfactory-0.0.1-SNAPSHOT.jar  
+you can run it also with -log switch to show more extensive logging:  
 java -jar target/foodfactory-0.0.1-SNAPSHOT.jar -log
 
 Number of products, their sizes and cooking times are generated automatically after start for every assembly line. Maximum nuber generator values are set by constant FoodFactoryMain.MAX_NUMBER_FROM_GENERATOR.
